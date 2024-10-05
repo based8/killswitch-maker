@@ -2,18 +2,15 @@
 ETH=$(ip addr | grep "2: " | cut -d":" -f2)
 WLAN=$(ip addr | grep "3: " | cut -d":" -f2)
 
-if [ "$(echo $1) = conf" ] && [ "$(ls $2 | grep .conf )" ]; then
-	CONFDIR=$2
-	echo $2
+if [ "$(echo $1) = conf" ] && [ "$(ls $1 | grep .conf )" ]; then
+	VPNFILE=$1
 else
-	echo "conf option requires argument"
+	echo "You should specify your .conf file"
 	exit
 fi;
 
 if [ $($CONFDIR) ] && [ "$(whoami) = root" ] ; then
-	VPNFILE=$(ls ./ | grep .conf)	
-	ROUTLIST=$(cat ./$VPNFILE | grep "remote " | cut -d" " -f2-3)
-		
+	ROUTLIST=$(cat $VPNFILE | grep "remote " | cut -d" " -f2-3)
 
 	iptables-save > iptables-old
 	echo "backup iptables config saved to $(pwd)/iptables-old"
