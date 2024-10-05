@@ -20,6 +20,8 @@ if [ "$(whoami) = root" ] ; then
 	iptables -A OUTPUT -o tun0 -j ACCEPT
 	iptables -A INPUT -i lo -j ACCEPT
 	iptables -A OUTPUT -o lo -j ACCEPT
+	iptables -A INPUT -s 255.255.255.255 -j ACCEPT
+	iptables -A OUTPUT -d 255.255.255.255 -j ACCEPT
 
 	for rout in $ROUTLIST; do
 		if [[ $rout == *.* ]]; then

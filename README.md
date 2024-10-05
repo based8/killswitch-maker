@@ -14,7 +14,7 @@ cd killswitch-maker
 
 And run it with superuser privileges
 ```
-chmod 770 user:user killswitch-maker.sh
+chmod 770 killswitch-maker.sh
 sudo ./killswitch-maker.sh <~/your/vpn/file.conf>
 ```
 
