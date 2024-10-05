@@ -9,7 +9,7 @@ else
 	exit
 fi;
 
-if [ $($VPNFILE) ] && [ "$(whoami) = root" ] ; then
+if [ $(echo $VPNFILE | grep .conf ) ] && [ "$(whoami) = root" ] ; then
 	ROUTLIST=$(cat $VPNFILE | grep "remote " | cut -d" " -f2-3)
 
 	iptables-save > iptables-old
