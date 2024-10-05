@@ -1,14 +1,22 @@
 #!/usr/bin/bash
 ETH=$(ip addr | grep "2: " | cut -d":" -f2)
 WLAN=$(ip addr | grep "3: " | cut -d":" -f2)
-echo "INTERFACES,$ETH and$WLAN"
 
-if [ "$(ls ./ | grep .conf)" ] ; then
+if [ "$(echo $1) = conf" ] && [ "$(ls $2 | grep .conf )" ]; then
+	CONFDIR=$2
+	echo $2
+else
+	echo "conf option requires argument"
+	exit
+fi;
+
+if [ $($CONFDIR) ] && [ "$(whoami) = root" ] ; then
 	VPNFILE=$(ls ./ | grep .conf)	
 	ROUTLIST=$(cat ./$VPNFILE | grep "remote " | cut -d" " -f2-3)
-	
+		
 
 	iptables-save > iptables-old
+	echo "backup iptables config saved to $(pwd)/iptables-old"
 	iptables -F && iptables -X
 
 	iptables -P OUTPUT DROP
@@ -32,7 +40,8 @@ if [ "$(ls ./ | grep .conf)" ] ; then
 	ip6tables -A OUTPUT -o tun0 -j ACCEPT
 
 else 
-	echo "ass"
+	echo "Make sure to run with superuser privileges"
+	exit
 fi;
 
 
