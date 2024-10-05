@@ -9,7 +9,7 @@ else
 	exit
 fi;
 
-if [ $(echo $VPNFILE | grep .conf ) ] && [ "$(whoami) = root" ] ; then
+if [ "$(whoami) = root" ] ; then
 	ROUTLIST=$(cat $VPNFILE | grep "remote " | cut -d" " -f2-3)
 
 	iptables-save > iptables-old
@@ -20,22 +20,22 @@ if [ $(echo $VPNFILE | grep .conf ) ] && [ "$(whoami) = root" ] ; then
 	iptables -A OUTPUT -o tun0 -j ACCEPT
 	iptables -A INPUT -i lo -j ACCEPT
 	iptables -A OUTPUT -o lo -j ACCEPT
-	iptables -A INPUT -s 255.255.255.255 -j ACCEPT
-	iptables -A OUTPUT -d 255.255.255.255 -j ACCEPT
 
 	for rout in $ROUTLIST; do
 		if [[ $rout == *.* ]]; then
 			IP=$rout
 		else
-			echo "Setting IP: $IP and PORT: $rout"
+			echo "Allowing traffic on $IP/24:$rout"
 		        iptables -A OUTPUT -o$WLAN -p udp -m udp --dport $rout -d $IP/24 -j ACCEPT
 		        iptables -A OUTPUT -o$ETH -p udp -m udp --dport $rout -d $IP/24 -j ACCEPT
 		fi;
 	done
-	
+
 	ip6tables -P OUTPUT DROP
 	ip6tables -A OUTPUT -o tun0 -j ACCEPT
 
+	echo done
+	exit
 else 
 	echo "Make sure to run with superuser privileges"
 	exit
