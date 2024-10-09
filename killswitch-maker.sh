@@ -1,7 +1,10 @@
 #!/usr/bin/bash
 ETH=$(ip addr | grep "2: " | cut -d":" -f2)
-WLAN=$(ip addr | grep "3: " | cut -d":" -f2)
+WLAN=$(ip addr | grep "3: w" | cut -d":" -f2)
 
+if [ "$(ip addr | grep $2)" ]; then
+	INTER=$2
+fi;
 if [ "$(echo $1) = conf" ] && [ "$(ls $1 | grep .conf )" ]; then
 	VPNFILE=$1
 else
@@ -9,7 +12,7 @@ else
 	exit
 fi;
 
-if [ "$(whoami) = root" ] ; then
+if [ $(whoami) = root ] ; then
 	ROUTLIST=$(cat $VPNFILE | grep "remote " | cut -d" " -f2-3)
 
 	iptables-save > iptables-old
@@ -22,6 +25,12 @@ if [ "$(whoami) = root" ] ; then
 	iptables -A OUTPUT -o lo -j ACCEPT
 	iptables -A INPUT -s 255.255.255.255 -j ACCEPT
 	iptables -A OUTPUT -d 255.255.255.255 -j ACCEPT
+
+	if [ $INTER ]; then 
+		iptables -A INPUT -i $2 -j ACCEPT
+		iptables -A OUTPUT -o $2 -j ACCEPT
+		echo "I/O enabled for interface $INTER"
+	fi;
 
 	for rout in $ROUTLIST; do
 		if [[ $rout == *.* ]]; then
